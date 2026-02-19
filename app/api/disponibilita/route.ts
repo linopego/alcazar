@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     const disponibilita = sale.map((sala: typeof sale[number]) => {
       // Verifica blocco sala
       const eventoBloccante = eventi.find(
-        (e) =>
+        (e: typeof eventi[number]) =>
           (e.salaId === null || e.salaId === sala.id) &&
           e.tipo === "CHIUSURA_STRAORDINARIA"
       );
