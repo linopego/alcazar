@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    const disponibilita = sale.map((sala) => {
+    const disponibilita = sale.map((sala: typeof sale[number]) => {
       // Verifica blocco sala
       const eventoBloccante = eventi.find(
         (e) =>
