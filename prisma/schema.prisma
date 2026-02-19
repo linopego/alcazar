@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Cliente {
+  id        String   @id @default(cuid())
+  nome      String
+  telefono  String   @unique
+  email     String?
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  prenotazioni Prenotazione[]
+  listaAttesa  ListaAttesa[]
+}
+
+model Sala {
+  id          String  @id @default(cuid())
+  nome        String
+  tavoli      Int
+  capienzaMax Int
+  colore      String  @default("#6366f1")
+  attiva      Boolean @default(true)
+
+  prenotazioni Prenotazione[]
+  eventi       Evento[]
+}
+
+model Prenotazione {
+  id        String            @id @default(cuid())
+  clienteId String
+  salaId    String
+  data      DateTime          @db.Date
+  orario    String
+  coperti   Int
+  stato     StatoPrenotazione @default(IN_ATTESA)
+  note      String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  cliente   Cliente    @relation(fields: [clienteId], references: [id])
+  sala      Sala       @relation(fields: [salaId], references: [id])
+  notifiche Notifica[]
+}
+
+enum StatoPrenotazione {
+  CONFERMATA
+  IN_ATTESA
+  CANCELLATA
+  NON_PRESENTATO
+}
+
+model ListaAttesa {
+  id              String      @id @default(cuid())
+  clienteId       String
+  data            DateTime    @db.Date
+  orarioPreferito String?
+  coperti         Int
+  note            String?
+  stato           StatoAttesa @default(IN_ATTESA)
+  createdAt       DateTime    @default(now())
+
+  cliente Cliente @relation(fields: [clienteId], references: [id])
+}
+
+enum StatoAttesa {
+  IN_ATTESA
+  PROMOSSO
+  CANCELLATO
+}
+
+model Evento {
+  id                String     @id @default(cuid())
+  nome              String
+  data              DateTime   @db.Date
+  orarioInizio      String?
+  orarioFine        String?
+  salaId            String?
+  tipo              TipoEvento
+  note              String?
+  menuFisso         Boolean    @default(false)
+  caparra           Boolean    @default(false)
+  importoCaparra    Decimal?   @db.Decimal(10, 2)
+  referente         String?
+  telefonoReferente String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  sala Sala? @relation(fields: [salaId], references: [id])
+}
+
+enum TipoEvento {
+  CENA_PRIVATA
+  SERATA_A_TEMA
+  CHIUSURA_STRAORDINARIA
+  ALTRO
+}
+
+model Notifica {
+  id             String         @id @default(cuid())
+  prenotazioneId String
+  tipo           TipoNotifica
+  canale         CanaleNotifica
+  stato          StatoNotifica  @default(IN_ATTESA)
+  inviattoAt     DateTime?
+  createdAt      DateTime       @default(now())
+
+  prenotazione Prenotazione @relation(fields: [prenotazioneId], references: [id], onDelete: Cascade)
+}
+
+enum TipoNotifica {
+  CONFERMA
+  PROMEMORIA
+  CANCELLAZIONE
+}
+
+enum CanaleNotifica {
+  SMS
+  EMAIL
+}
+
+enum StatoNotifica {
+  IN_ATTESA
+  INVIATA
+  FALLITA
+}
