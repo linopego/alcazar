@@ -35,8 +35,8 @@ export async function GET(req: NextRequest) {
           e.tipo === "CHIUSURA_STRAORDINARIA"
       );
 
-      const prenotazioniSala = prenotazioni.filter((p) => p.salaId === sala.id);
-      const coperttiOccupati = prenotazioniSala.reduce((sum, p) => sum + p.coperti, 0);
+      const prenotazioniSala = prenotazioni.filter((p: typeof prenotazioni[number]) => p.salaId === sala.id);
+      const coperttiOccupati = prenotazioniSala.reduce((sum: number, p: typeof prenotazioni[number]) => sum + p.coperti, 0);
 
       return {
         salaId: sala.id,
